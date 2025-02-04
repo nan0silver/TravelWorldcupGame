@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:title" content="여행 도시 이상형 월드컵" />
+    <meta
+      property="og:description"
+      content="16개 인기 여행 도시 중 최고의 여행지를 골라보세요!"
+    />
+    <meta
+      property="og:image"
+      content="https://yourwebsite.com/images/og-image.jpg"
+    />
+    <meta property="og:url" content="https://yourwebsite.com" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="여행 월드컵" />
+
+    <title>여행 도시 이상형 월드컵</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Arial", sans-serif;
+      }
+
+      /* 🎨 배경 스타일 */
+      body {
+        background: linear-gradient(to bottom, #4a90e2, #9147ff);
+        background-attachment: fixed;
+        text-align: center;
+        padding: 20px;
+        color: white;
+        position: relative;
+        min-height: 100vh;
+      }
+
+      /* 🎨 도시 실루엣 배경 */
+      body::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("images/city-silhouette.avif") no-repeat center bottom;
+        background-size: cover;
+        opacity: 0.2;
+        z-index: -1; /* 🛠️ 배경이 클릭을 막지 않도록 뒤로 배치 */
+      }
+
+      h1 {
+        font-size: 32px;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      #round-info {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      #container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      /* 📍 카드 스타일 (클릭 가능하도록 보장) */
+      .card {
+        position: relative; /* 🛠️ 배경보다 앞에 있도록 설정 */
+        width: 280px;
+        height: 350px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease-in-out;
+        cursor: pointer;
+        background: white;
+        color: black;
+      }
+
+      .card:hover {
+        transform: scale(1.05);
+      }
+
+      .card img {
+        width: 100%;
+        height: 75%;
+        object-fit: cover;
+      }
+
+      .card h3 {
+        font-size: 20px;
+        padding: 10px;
+        background: white;
+      }
+
+      /* 🏆 우승 스타일 */
+      .winner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 30px;
+      }
+
+      .winner img {
+        width: 350px;
+        height: 350px;
+        border-radius: 15px;
+        border: 6px solid gold;
+        box-shadow: 0 0 15px gold;
+      }
+
+      .winner h2 {
+        font-size: 30px;
+        color: gold;
+        margin-top: 15px;
+      }
+
+      @media (max-width: 768px) {
+        #container {
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .card {
+          width: 90%;
+        }
+
+        .winner img {
+          width: 80%;
+          height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>여행 도시 이상형 월드컵</h1>
+    <div id="round-info"></div>
+    <div id="container"></div>
+
+    <script>
+      let cities = [
+        "Paris",
+        "London",
+        "Rome",
+        "New_York",
+        "Tokyo",
+        "Seoul",
+        "Bangkok",
+        "Barcelona",
+        "Dubai",
+        "Sydney",
+        "Hong_Kong",
+        "Singapore",
+        "Istanbul",
+        "Amsterdam",
+        "Berlin",
+        "Prague",
+      ];
+
+      let roundCities = [...cities];
+      let nextRound = [];
+      let roundNumber = 1;
+      let shuffled = [];
+
+      const container = document.querySelector("#container");
+      const roundInfo = document.querySelector("#round-info");
+
+      function startRound() {
+        container.innerHTML = "";
+        roundInfo.innerText = `Round ${roundNumber} - ${roundCities.length}강`;
+
+        if (roundCities.length === 1) {
+          showWinner(roundCities[0]);
+          return;
+        }
+
+        shuffled = [...roundCities].sort(() => Math.random() - 0.5);
+        nextRound = [];
+
+        showNextPair();
+      }
+
+      function showNextPair() {
+        container.innerHTML = "";
+
+        if (shuffled.length < 2) {
+          roundCities = [...nextRound];
+          roundNumber++;
+          setTimeout(startRound, 1000);
+          return;
+        }
+
+        const pick1 = shuffled.pop();
+        const pick2 = shuffled.pop();
+
+        createCard(pick1);
+        createCard(pick2);
+      }
+
+      function createCard(cityName) {
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const img = document.createElement("img");
+        img.src = `images/${cityName}.avif`;
+        img.alt = cityName.replace(/_/g, " ");
+
+        const title = document.createElement("h3");
+        title.innerText = cityName.replace(/_/g, " ");
+
+        card.appendChild(img);
+        card.appendChild(title);
+
+        card.addEventListener("click", () => selectWinner(cityName));
+
+        container.appendChild(card);
+      }
+
+      function selectWinner(winner) {
+        nextRound.push(winner);
+        showNextPair();
+      }
+
+      function showWinner(winningCity) {
+        container.innerHTML = "";
+        roundInfo.innerText = "";
+
+        const winnerDiv = document.createElement("div");
+        winnerDiv.classList.add("winner");
+
+        const img = document.createElement("img");
+        img.src = `images/${winningCity}.avif`;
+        img.alt = winningCity.replace(/_/g, " ");
+
+        const text = document.createElement("h2");
+        text.innerText = `🎉 ${winningCity.replace(/_/g, " ")} 우승! 🎉`;
+
+        winnerDiv.appendChild(img);
+        winnerDiv.appendChild(text);
+        container.appendChild(winnerDiv);
+      }
+
+      startRound();
+    </script>
+  </body>
+</html>
